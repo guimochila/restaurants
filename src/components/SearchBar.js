@@ -6,7 +6,7 @@ const ViewContainer = styled.View`
   background-color: #f0eeee;
   height: 50;
   border-radius: 5px;
-  margin: 15px 15px 0 15px;
+  margin: 15px 15px 10px 15px;
   flex-direction: row;
 `;
 

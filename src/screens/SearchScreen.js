@@ -1,35 +1,40 @@
 import React, { useState } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 
 import SearchBar from '../components/SearchBar';
-import yelp from '../api/yelp';
+import RestaurantsList from '../components/RestaurantsList';
+import useRestaurants from '../hooks/useRestaurants';
 
 const SearchScreen = () => {
   const [term, setTerm] = useState('');
-  const [restaurants, setRestaurants] = useState([]);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [searchApi, restaurants, errorMessage] = useRestaurants();
 
-  const searchApi = async () => {
-    try {
-      const { data } = await yelp.get('/search', {
-        params: {
-          term,
-          limit: 50,
-          location: 'xativa',
-        },
-      });
-
-      setRestaurants(data.businesses);
-    } catch (error) {
-      setErrorMessage('Something went wrong');
-    }
+  const filterRestaurantsByPrice = price => {
+    return restaurants.filter(restaurant => restaurant.price === price);
   };
 
   return (
-    <View>
-      <SearchBar term={term} onTermChange={setTerm} onTermSubmit={searchApi} />
+    <View style={{ flex: 1 }}>
+      <SearchBar
+        term={term}
+        onTermChange={setTerm}
+        onTermSubmit={() => searchApi(term)}
+      />
       {errorMessage ? <Text>{errorMessage}</Text> : null}
-      <Text>We have found {restaurants.length}</Text>
+      <ScrollView>
+        <RestaurantsList
+          title="Cost Effective"
+          restaurants={filterRestaurantsByPrice('€')}
+        />
+        <RestaurantsList
+          title="Bit Pricier"
+          restaurants={filterRestaurantsByPrice('€€')}
+        />
+        <RestaurantsList
+          title="Big Spender"
+          restaurants={filterRestaurantsByPrice('€€€')}
+        />
+      </ScrollView>
     </View>
   );
 };
